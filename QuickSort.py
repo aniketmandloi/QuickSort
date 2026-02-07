@@ -1,40 +1,32 @@
-from random import randrange, shuffle
+def sort_list_interval(unsorted_list: list[int], start: int, end: int) -> None:
+    # If segment is 1 or 0, it's sorted
+    if end - start <= 1:
+        return
 
-def quicksort(list, start, end):
-  # this portion of list has been sorted
-  if start >= end:
-    return
-  print("Running quicksort on {0}".format(list[start: end + 1]))
-  # select random element to be pivot
-  pivot_idx = randrange(start, end + 1)
-  pivot_element = list[pivot_idx]
-  print("Selected pivot {0}".format(pivot_element))
-  # swap random element with last element in sub-lists
-  list[end], list[pivot_idx] = list[pivot_idx], list[end]
+    # Using last element as the pivot
+    pivot = unsorted_list[end - 1]
+    start_ptr, end_ptr = start, end - 1
 
-  # tracks all elements which should be to left (lesser than) pivot
-  less_than_pointer = start
-  
-  for i in range(start, end):
-    # we found an element out of place
-    if list[i] < pivot_element:
-      # swap element to the right-most portion of lesser elements
-      print("Swapping {0} with {1}".format(list[i], list[less_than_pointer]))
-      list[i], list[less_than_pointer] = list[less_than_pointer], list[i]
-      # tally that we have one more lesser element
-      less_than_pointer += 1
-  # move pivot element to the right-most portion of lesser elements
-  list[end], list[less_than_pointer] = list[less_than_pointer], list[end]
-  print("{0} successfully partitioned".format(list[start: end + 1]))
-  # recursively sort left and right sub-lists
-  quicksort(list, start, less_than_pointer - 1)
-  quicksort(list, less_than_pointer + 1, end)
+    # Partitioning process
+    while start_ptr < end_ptr:
+        # Find the next element from the left that is larger than the pivot
+        while unsorted_list[start_ptr] < pivot and start_ptr < end_ptr:
+            start_ptr += 1
 
+        # Find the next element from the right that is smaller than or equal to the pivot
+        while unsorted_list[end_ptr] >= pivot and start_ptr < end_ptr:
+            end_ptr -= 1
 
-    
-  
-list = [5,3,1,7,4,6,2,8]
-shuffle(list)
-print("PRE SORT: ", list)
-print(quicksort(list, 0, len(list) -1))
-print("POST SORT: ", list)
+        # Swap if pointers haven't met
+        unsorted_list[start_ptr], unsorted_list[end_ptr] = unsorted_list[end_ptr], unsorted_list[start_ptr]
+
+    # Place pivot in its final position
+    unsorted_list[start_ptr], unsorted_list[end - 1] = unsorted_list[end - 1], unsorted_list[start_ptr]
+
+    # Sort left and right of the pivot
+    sort_list_interval(unsorted_list, start, start_ptr)
+    sort_list_interval(unsorted_list, start_ptr + 1, end)
+
+def sort_list(unsorted_list: list[int]) -> list[int]:
+    sort_list_interval(unsorted_list, 0, len(unsorted_list))
+    return unsorted_list
